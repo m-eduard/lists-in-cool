@@ -9,38 +9,41 @@ class Main inherits IO {
             classInitializer: StringTokenizer <- new StringTokenizer,
             newList: List <- new List
         in {
-            classInitializer.init(in_string(), " ");
-            className <- classInitializer.nextToken();
+            while not className = "END" loop {
+                classInitializer.init(in_string(), " ");
+                className <- classInitializer.nextToken();
 
-            if className = "String" then {
-                newList.add(classInitializer.nextToken());
-            } else if className = "Int" then {
-                newList.add(new PrintableInt.atoi(classInitializer.nextToken()));
-            } else if className = "Bool" then {
-                newList.add(classInitializer.nextToken() = "true");
+                if className = "String" then {
+                    newList.add(classInitializer.nextToken());
+                } else if className = "Int" then {
+                    newList.add(new PrintableInt.atoi(classInitializer.nextToken()));
+                } else if className = "Bool" then {
+                    newList.add(classInitializer.nextToken() = "true");
 
-            -- } else if className = "IO" then {
+                -- } else if className = "IO" then {
 
-            -- } else if className = "Soda" then {
+                -- } else if className = "Soda" then {
 
-            -- } else if className = "Coffee" then {
+                -- } else if className = "Coffee" then {
 
-            -- } else if className = "Laptop" then {
+                -- } else if className = "Laptop" then {
 
-            -- } else if className = "Router" then {
+                -- } else if className = "Router" then {
 
-            -- } else if className = "Private" then {
+                -- } else if className = "Private" then {
 
-            -- } else if className = "Corporal" then {
+                -- } else if className = "Corporal" then {
 
-            -- } else if className = "Sergent" then {
+                -- } else if className = "Sergent" then {
 
-            -- } else if className = "Officer" then {
-
-            } else {
-                abort();
-            } fi fi fi;
-            --  fi fi fi fi fi fi fi fi fi;
+                -- } else if className = "Officer" then {
+                } else if className = "END" then {
+                    newList;
+                } else {
+                    abort();
+                } fi fi fi fi;
+                --  fi fi fi fi fi fi fi fi fi;
+            } pool;
 
             lists.add(newList);
         };
