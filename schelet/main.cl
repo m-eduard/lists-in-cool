@@ -24,32 +24,41 @@ class Main inherits IO {
                             else abort() fi fi
                         );
                     };
-
-                    
-
-                -- } else if className = "IO" then {
-
-                -- } else if className = "Soda" then {
-
-                -- } else if className = "Coffee" then {
-
-                -- } else if className = "Laptop" then {
-
-                -- } else if className = "Router" then {
-
-                -- } else if className = "Private" then {
-
-                -- } else if className = "Corporal" then {
-
-                -- } else if className = "Sergent" then {
-
-                -- } else if className = "Officer" then {
+                } else if className = "IO" then {
+                    newList.add(new IO);
+                } else if className = "Soda" then {
+                    newList.add(new Soda.init(classInitializer.nextToken(),
+                        classInitializer.nextToken(),
+                        new PrintableInt.atoi(classInitializer.nextToken())
+                    ));
+                } else if className = "Coffee" then {
+                    newList.add(new Coffee.init(classInitializer.nextToken(),
+                        classInitializer.nextToken(),
+                        new PrintableInt.atoi(classInitializer.nextToken())
+                    ));
+                } else if className = "Laptop" then {
+                    newList.add(new Laptop.init(classInitializer.nextToken(),
+                        classInitializer.nextToken(),
+                        new PrintableInt.atoi(classInitializer.nextToken())
+                    ));
+                } else if className = "Router" then {
+                    newList.add(new Router.init(classInitializer.nextToken(),
+                        classInitializer.nextToken(),
+                        new PrintableInt.atoi(classInitializer.nextToken())
+                    ));
+                } else if className = "Private" then {
+                    newList.add(new Private.init(classInitializer.nextToken()));
+                } else if className = "Corporal" then {
+                    newList.add(new Corporal.init(classInitializer.nextToken()));
+                } else if className = "Sergent" then {
+                    newList.add(new Sergent.init(classInitializer.nextToken()));
+                } else if className = "Officer" then {
+                    newList.add(new Officer.init(classInitializer.nextToken()));
                 } else if className = "END" then {
                     newList;
                 } else {
                     abort();
-                } fi fi fi fi;
-                --  fi fi fi fi fi fi fi fi fi;
+                } fi fi fi fi fi fi fi fi fi fi fi fi fi;
             } pool;
 
             lists.add(newList);
@@ -71,11 +80,6 @@ class Main inherits IO {
                 load();
             } else if cmd = "print" then {
                 out_string(lists.toString().concat("\n"));
-
-                -- let list1 : List <- new List.add("ann has a").add("lot of apples").add(new List.add(new List.add(32))) in {
-                --     list1.add("and lots of ...");
-                --     out_string(list1.toString());
-                -- };
             } else if cmd = "merge" then {
                 out_string("print\n");
             } else if cmd = "filterBy" then {

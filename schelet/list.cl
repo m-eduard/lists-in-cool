@@ -1,7 +1,7 @@
 -- Base class that implements a toString method
 class PrintableObject inherits Object {
     toString() : String {
-        "content"
+        ""
     };
 
     -- This method might've been omitted if we were allowed to
@@ -9,7 +9,7 @@ class PrintableObject inherits Object {
     -- using self.type_name(), but in this case, for example, instead
     -- of Bool(true) we would've seen PrintableBool(true) at STDOUT
     getContentType() : String {
-        "String"
+        ""
     };
 
     -- This method will not be overriden in any child class
@@ -30,18 +30,16 @@ class PrintableInt inherits PrintableObject {
         self;
     }};
 
-    atoi(s: String) : PrintableInt {{
-        value <- 0;
-
-        let i: Int <- 0 in {
+    atoi(s: String) : Int {
+        let num: Int <- 0, i: Int <- 0 in {
             while i < s.length() loop {
-                value <- value * 10 + string2Digit(s.substr(i, 1));
+                num <- num * 10 + string2Digit(s.substr(i, 1));
                 i <- i + 1;
             } pool;
-        };
 
-        self;
-    }};
+            num;
+        }
+    };
 
     string2Digit(s: String) : Int {
         if s = "0" then 0 else
@@ -126,6 +124,19 @@ class PrintableBool inherits PrintableObject {
     };
 };
 
+class PrintableIO inherits PrintableObject {
+    value: IO;
+
+    init(v : IO) : PrintableIO {{
+        value <- v;
+        self;
+    }};
+
+    getContentType() : String {
+        "IO"
+    };
+};
+
 -- Generic list class that wraps each newly added element
 -- into a PrintableObject (base class which has a toString method).
 -- It can store other lists, primitive types and objects which
@@ -140,10 +151,11 @@ class List inherits PrintableObject {
             -- Wrap the new element in a PrintableObject
             let wrappedO: PrintableObject <-
                 case o of
+                    printable: PrintableObject => printable;
                     s: String => new PrintableString.init(s);
                     i: Int => new PrintableInt.init(i);
                     b: Bool => new PrintableBool.init(b);
-                    printable: PrintableObject => printable;
+                    io: IO => new PrintableIO.init(io);
                     list: List => list;
                     obj: Object => {abort(); new PrintableInt.init(0);};
                 esac
