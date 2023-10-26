@@ -18,7 +18,14 @@ class Main inherits IO {
                 } else if className = "Int" then {
                     newList.add(new PrintableInt.atoi(classInitializer.nextToken()));
                 } else if className = "Bool" then {
-                    newList.add(classInitializer.nextToken() = "true");
+                    let value: String <- classInitializer.nextToken() in {
+                        newList.add(if value = "true" then true
+                            else if value = "false" then false
+                            else abort() fi fi
+                        );
+                    };
+
+                    
 
                 -- } else if className = "IO" then {
 
