@@ -67,19 +67,22 @@ class Main inherits IO {
         self;
     }};
 
-    main() : Object {
+    main() : Object {{
+        -- First command is a load from STDIN
+        -- (the name of the command is not explicitly provided)
+        cmd <- "load";
+
         while looping loop {
-            out_string("> ");
-
-            stringTokenizer.init(in_string(), " ");
-            cmd <- stringTokenizer.nextToken();
-
             if cmd = "help" then {
                 out_string("Available commands:\n-> load <class_type attr1 attr2 ...> ...\n");
             } else if cmd = "load" then {
                 load();
             } else if cmd = "print" then {
-                out_string(lists.toString().concat("\n"));
+                out_string(if stringTokenizer.hasMoreTokens() then
+                    lists.get(new PrintableInt.atoi(stringTokenizer.nextToken()) - 1).toString()
+                else
+                    lists.toStringIndexed()
+                fi.concat("\n"));
             } else if cmd = "merge" then {
                 out_string("print\n");
             } else if cmd = "filterBy" then {
@@ -92,9 +95,12 @@ class Main inherits IO {
                 out_string("unknown command\n");
                 abort();
             } fi fi fi fi fi fi fi;
+
+            stringTokenizer.init(in_string(), " ");
+            cmd <- stringTokenizer.nextToken();
             
-        } pool
-    };
+        } pool;
+    }};
 };
 
 -- Class that splits a string in a list of tokens

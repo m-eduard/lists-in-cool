@@ -73,11 +73,11 @@ class PrintableInt inherits PrintableObject {
         } fi fi fi fi fi fi fi fi fi fi
     };
 
-    toStringHelper(num: Int) : String {
+    itoa(num: Int) : String {
         if num < 10 then {
-            if num < 0 then "-".concat(toStringHelper(~num)) else digit2String(num) fi;
+            if num < 0 then "-".concat(itoa(~num)) else digit2String(num) fi;
         } else {
-            toStringHelper(num / 10).concat(digit2String(num - (num / 10) * 10));
+            itoa(num / 10).concat(digit2String(num - (num / 10) * 10));
         } fi
     };
 
@@ -86,7 +86,7 @@ class PrintableInt inherits PrintableObject {
     };
 
     toString() : String {
-        toStringHelper(value)
+        itoa(value)
     };
 };
 
@@ -174,20 +174,32 @@ class List inherits PrintableObject {
         self;
     }};
 
-    helperToString(delim: String) : String {
+    helperToString(delim: String, indexed: Bool, i: Int) : String {
         if isvoid hd then {
             "";
         } else {
             if isvoid tl then {
-                hd.toPrettyString();
+                if indexed then
+                    new PrintableInt.itoa(i).concat(": ").concat(hd.toPrettyString())
+                else
+                    hd.toPrettyString()
+                fi;
             } else {
-                hd.toPrettyString().concat(delim).concat(tl.helperToString(delim));
+                if indexed then
+                    new PrintableInt.itoa(i).concat(": ").concat(hd.toPrettyString())
+                else
+                    hd.toPrettyString()
+                fi.concat(delim).concat(tl.helperToString(delim, indexed, i + 1));
             } fi;
         } fi
     };
 
     toString() : String {
-        "[".concat(self.helperToString(", ")).concat("]")
+        "[ ".concat(self.helperToString(", ", false, 1)).concat(" ]")
+    };
+
+    toStringIndexed() : String {
+        self.helperToString("\n", true, 1)
     };
 
     size() : Int {
