@@ -1,12 +1,52 @@
 class Main inherits IO {
-    lists : List;
-    looping : Bool <- true;
-    cmd : String;
-    stringTokenizer : StringTokenizer <- new StringTokenizer;
+    lists: List <- new List;
+    looping: Bool <- true;
+    cmd: String;
+    stringTokenizer: StringTokenizer <- new StringTokenizer;
 
-    load() : IO {
-        out_string("asdasd")
-    };
+    load() : SELF_TYPE {{
+        let className: String,
+            classInitializer: StringTokenizer <- new StringTokenizer,
+            newList: List <- new List
+        in {
+            classInitializer.init(in_string(), " ");
+            className <- classInitializer.nextToken();
+
+            if className = "String" then {
+                newList.add(classInitializer.nextToken());
+            } else if className = "Int" then {
+                newList.add(new PrintableInt.atoi(classInitializer.nextToken()));
+            } else if className = "Bool" then {
+                newList.add(classInitializer.nextToken() = "true");
+
+            -- } else if className = "IO" then {
+
+            -- } else if className = "Soda" then {
+
+            -- } else if className = "Coffee" then {
+
+            -- } else if className = "Laptop" then {
+
+            -- } else if className = "Router" then {
+
+            -- } else if className = "Private" then {
+
+            -- } else if className = "Corporal" then {
+
+            -- } else if className = "Sergent" then {
+
+            -- } else if className = "Officer" then {
+
+            } else {
+                abort();
+            } fi fi fi;
+            --  fi fi fi fi fi fi fi fi fi;
+
+            lists.add(newList);
+        };
+
+        self;
+    }};
 
     main() : Object {
         while looping loop {
@@ -18,9 +58,9 @@ class Main inherits IO {
             if cmd = "help" then {
                 out_string("Available commands:\n-> load <class_type attr1 attr2 ...> ...\n");
             } else if cmd = "load" then {
-                out_string("load\n");
-            } else if cmd = "print" then {
                 load();
+            } else if cmd = "print" then {
+                out_string(lists.toString().concat("\n"));
 
                 -- let list1 : List <- new List.add("ann has a").add("lot of apples").add(new List.add(new List.add(32))) in {
                 --     list1.add("and lots of ...");
@@ -95,7 +135,8 @@ class StringTokenizer inherits IO {
         self;
     }};
 
-    -- Update the current position in the tokens list
+    -- Return the current token as String and
+    -- pdate the current position in the tokens list
     nextToken() : String {{
         currentPos <- currentPos + 1;
         tokens.get(currentPos - 1).toString();

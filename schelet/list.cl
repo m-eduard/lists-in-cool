@@ -1,7 +1,24 @@
 -- Base class that implements a toString method
 class PrintableObject inherits Object {
     toString() : String {
-        "PrintableObject"
+        "content"
+    };
+
+    -- This method might've been omitted if we were allowed to
+    -- print the real type of the current instance in toPrettyString(),
+    -- using self.type_name(), but in this case, for example, instead
+    -- of Bool(true) we would've seen PrintableBool(true) at STDOUT
+    getContentType() : String {
+        "String"
+    };
+
+    -- This method will not be overriden in any child class
+    -- (it depends on the actual implementation of toString())
+    toPrettyString() : String {
+        case self of 
+            l: List => toString();
+            o: Object => getContentType().concat("(").concat(toString()).concat(")");
+        esac
     };
 };
 
@@ -9,9 +26,38 @@ class PrintableInt inherits PrintableObject {
     value: Int;
 
     init(v: Int) : PrintableInt {{
-            value <- v;
-            self;
+        value <- v;
+        self;
     }};
+
+    atoi(s: String) : PrintableInt {{
+        value <- 0;
+
+        let i: Int <- 0 in {
+            while i < s.length() loop {
+                value <- value * 10 + string2Digit(s.substr(i, 1));
+                i <- i + 1;
+            } pool;
+        };
+
+        self;
+    }};
+
+    string2Digit(s: String) : Int {
+        if s = "0" then 0 else
+        if s = "1" then 1 else
+        if s = "2" then 2 else
+        if s = "3" then 3 else
+        if s = "4" then 4 else
+        if s = "5" then 5 else
+        if s = "6" then 6 else
+        if s = "7" then 7 else
+        if s = "8" then 8 else
+        if s = "9" then 9 else {
+            abort();
+            0;
+        } fi fi fi fi fi fi fi fi fi fi
+    };
 
     digit2String(num: Int) : String {
         if num = 0 then "0" else
@@ -37,6 +83,10 @@ class PrintableInt inherits PrintableObject {
         } fi
     };
 
+    getContentType() : String {
+        "Int"
+    };
+
     toString() : String {
         toStringHelper(value)
     };
@@ -49,6 +99,10 @@ class PrintableString inherits PrintableObject {
         value <- v;
         self;
     }};
+
+    getContentType() : String {
+        "String"
+    };
 
     toString() : String {
         value
@@ -63,17 +117,25 @@ class PrintableBool inherits PrintableObject {
         self;
     }};
 
+    getContentType() : String {
+        "Bool"
+    };
+
     toString() : String {
         if value then "true" else "false" fi
     };
 };
 
+-- Generic list class that wraps each newly added element
+-- into a PrintableObject (base class which has a toString method).
+-- It can store other lists, primitive types and objects which
+-- inherit from Product / Rank base classes.
 class List inherits PrintableObject {
     hd: PrintableObject;
     tl: List;
     size: Int <- 0;
 
-    add(o : Object):SELF_TYPE {{
+    add(o : Object) : SELF_TYPE {{
         if isvoid hd then {
             -- Wrap the new element in a PrintableObject
             let wrappedO: PrintableObject <-
@@ -105,9 +167,9 @@ class List inherits PrintableObject {
             "";
         } else {
             if isvoid tl then {
-                hd.toString();
+                hd.toPrettyString();
             } else {
-                hd.toString().concat(delim).concat(tl.helperToString(delim));
+                hd.toPrettyString().concat(delim).concat(tl.helperToString(delim));
             } fi;
         } fi
     };
