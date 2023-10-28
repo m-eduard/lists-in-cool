@@ -263,11 +263,72 @@ class List inherits PrintableObject {
         self;
     }};
 
-    filterBy():SELF_TYPE {
-        self (* TODO *)
-    };
+    filterBy(filter: Filter) : SELF_TYPE {{
+        -- When hd is void, also the size is 0
+        if size = 0 then {
+            self;
+        } else {
+            if not filter.filter(hd) then {
+                size <- size - 1;
+
+                if not isvoid tl then {
+                    -- When the last element of a list of lists is removed,
+                    -- the last list only updates its size to 0, and the previous
+                    -- element still points to it, even though its size is 0
+                    if not tl.size() = 0 then {
+                        hd <- tl.getHd();
+                        tl <- tl.getTl();
+
+                        -- Now we have to check if the new element that
+                        -- replaced the old head is valid
+                        self.filterBy(filter);
+                    } else {
+                        hd;
+                    } fi;
+                } else {
+                    hd;
+                } fi;
+            } else {
+                if not isvoid tl then {
+                    tl.filterBy(filter);
+                    size <- tl.size() + 1;
+                } else {
+                    tl;
+                } fi;
+            } fi;
+        } fi;
+
+        self;
+    }};
 
     sortBy():SELF_TYPE {
         self (* TODO *)
+    };
+};
+
+class ProductFilter inherits Filter {
+    filter(o: Object) : Bool {
+        case o of
+            p: Product => true;
+            o: Object => false;
+        esac
+    };
+};
+
+class RankFilter inherits Filter {
+    filter(o: Object) : Bool {
+        case o of
+            r: Rank => true;
+            o: Object => false;
+        esac
+    };
+};
+
+class SamePriceFilter inherits Filter {
+    filter(o: Object) : Bool {
+        case o of
+            p: Product => p.getprice() = p@Product.getprice();
+            o: Object => false;
+        esac
     };
 };

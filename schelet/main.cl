@@ -72,13 +72,6 @@ class Main inherits IO {
         -- (the name of the command is not explicitly provided)
         cmd <- "load";
 
-        -- let test: List <- new List.add(1).add(2), other: List <- new List.add(3).add(4) in {
-        --     out_string(test.toString());
-        --     out_string(other.toString());
-
-        --     out_string(test.merge(other).toString());
-        -- };
-
         while looping loop {
             if cmd = "help" then {
                 out_string("Available commands:\n-> load <class_type attr1 attr2 ...> ...\n");
@@ -123,7 +116,23 @@ class Main inherits IO {
                     } fi;
                 };
             } else if cmd = "filterBy" then {
-                out_string("print\n");
+                let idx: Int <- new PrintableInt.atoi(stringTokenizer.nextToken()) - 1,
+                    ls: PrintableObject <- lists.get(idx),
+                    filterType: String <- stringTokenizer.nextToken(),
+                    filter: Filter
+                in {
+                    filter <- {if filterType = "ProductFilter" then new ProductFilter else
+                        if filterType = "RankFilter" then new RankFilter else
+                        if filterType = "SamePriceFilter" then new SamePriceFilter else {
+                            abort();
+                            new RankFilter;
+                        } fi fi fi;};
+
+                    case ls of
+                        l: List => l.filterBy(filter);
+                        o: Object => abort();
+                    esac;
+                };
             } else if cmd = "sortBy" then {
                 out_string("print\n");
             } else if cmd = "exit" then {
