@@ -146,8 +146,8 @@ class List inherits PrintableObject {
     tl: List;
     size: Int <- 0;
 
-    add(o : Object) : SELF_TYPE {{
-        if isvoid hd then {
+    add(o : Object) : List {{
+        if size = 0 then {
             -- Wrap the new element in a PrintableObject
             let wrappedO: PrintableObject <-
                 case o of
@@ -175,22 +175,15 @@ class List inherits PrintableObject {
     }};
 
     helperToString(delim: String, indexed: Bool, i: Int) : String {
-        if isvoid hd then {
+        if size = 0 then {
             "";
         } else {
-            if isvoid tl then {
-                if indexed then
-                    new PrintableInt.itoa(i).concat(": ").concat(hd.toPrettyString())
-                else
-                    hd.toPrettyString()
-                fi;
-            } else {
-                if indexed then
-                    new PrintableInt.itoa(i).concat(": ").concat(hd.toPrettyString())
-                else
-                    hd.toPrettyString()
-                fi.concat(delim).concat(tl.helperToString(delim, indexed, i + 1));
-            } fi;
+            if indexed then
+                new PrintableInt.itoa(i).concat(": ").concat(hd.toPrettyString())
+            else
+                hd.toPrettyString()
+            fi.concat(if isvoid tl then "" else if tl.size() = 0 then "" else
+                delim.concat(tl.helperToString(delim, indexed, i + 1)) fi fi);
         } fi
     };
 
@@ -220,9 +213,55 @@ class List inherits PrintableObject {
         } fi
     };
 
-    merge(other : List):SELF_TYPE {
-        self (* TODO *)
+    getHd() : PrintableObject {
+        hd
     };
+
+    getTl() : List {
+        tl
+    };
+
+    remove(idx: Int) : List {{
+        if size <= idx then {
+            abort();
+            self;
+        } else {
+            if idx = 0 then {
+                if isvoid tl then {
+                    -- It's impossible to make hd equal to void,
+                    -- so we just change the size of the current list
+                    hd;
+                } else {
+                    hd <- tl.getHd();
+                    tl <- tl.getTl();
+                } fi;
+            } else {
+                if not isvoid tl then {
+                    if not tl.size() = 0 then {
+                        tl.remove(idx - 1);
+                    } else tl fi;
+                } else tl fi;
+            } fi;
+
+            size <- size - 1;
+        } fi;
+
+        self;
+    }};
+
+    merge(other: List) : SELF_TYPE {{
+        if size = 0 then {
+            hd <- other.getHd();
+            tl <- other.getTl();
+        } else if isvoid tl then {
+            tl <- other;
+        } else {
+            tl.merge(other);
+        } fi fi;
+
+        size <- size + other.size();
+        self;
+    }};
 
     filterBy():SELF_TYPE {
         self (* TODO *)

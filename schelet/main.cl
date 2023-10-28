@@ -72,6 +72,13 @@ class Main inherits IO {
         -- (the name of the command is not explicitly provided)
         cmd <- "load";
 
+        -- let test: List <- new List.add(1).add(2), other: List <- new List.add(3).add(4) in {
+        --     out_string(test.toString());
+        --     out_string(other.toString());
+
+        --     out_string(test.merge(other).toString());
+        -- };
+
         while looping loop {
             if cmd = "help" then {
                 out_string("Available commands:\n-> load <class_type attr1 attr2 ...> ...\n");
@@ -84,7 +91,37 @@ class Main inherits IO {
                     lists.toStringIndexed()
                 fi.concat("\n"));
             } else if cmd = "merge" then {
-                out_string("print\n");
+                let idx1: Int <- new PrintableInt.atoi(stringTokenizer.nextToken()) - 1,
+                    idx2: Int <- new PrintableInt.atoi(stringTokenizer.nextToken()) - 1,
+                    ls1: PrintableObject <- lists.get(idx1),
+                    ls2: PrintableObject <- lists.get(idx2),
+                    ls: List
+                in {
+                    case ls1 of
+                        l: List => {
+                            case ls2 of
+                                l2: List => {
+                                    ls <- l.merge(l2);
+                                };
+                            esac;
+                        };
+                        o: Object => {abort();};
+                    esac;
+
+                    lists.add(ls);
+
+                    if idx1 < idx2 then {
+                        lists.remove(idx1);
+                        lists.remove(idx2 - 1);
+                    } else {
+                        if idx1 = idx2 then {
+                            abort();
+                        } else {
+                            lists.remove(idx1);
+                            lists.remove(idx2);
+                        } fi;
+                    } fi;
+                };
             } else if cmd = "filterBy" then {
                 out_string("print\n");
             } else if cmd = "sortBy" then {
@@ -93,7 +130,7 @@ class Main inherits IO {
                 abort();
             } else {
                 out_string("unknown command\n");
-                abort();
+                -- abort();
             } fi fi fi fi fi fi fi;
 
             stringTokenizer.init(in_string(), " ");
