@@ -8,7 +8,8 @@ class Filter {
     filter(o : Object):Bool {true};
 };
 
-(* Specified comparators and filters*)
+
+(* Specified comparators and filters *)
 class ProductFilter inherits Filter {
     filter(o: Object) : Bool {
         case o of
