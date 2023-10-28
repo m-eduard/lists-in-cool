@@ -121,12 +121,12 @@ class Main inherits IO {
                     filterType: String <- stringTokenizer.nextToken(),
                     filter: Filter
                 in {
-                    filter <- {if filterType = "ProductFilter" then new ProductFilter else
+                    filter <- if filterType = "ProductFilter" then new ProductFilter else
                         if filterType = "RankFilter" then new RankFilter else
                         if filterType = "SamePriceFilter" then new SamePriceFilter else {
                             abort();
                             new RankFilter;
-                        } fi fi fi;};
+                        } fi fi fi;
 
                     case ls of
                         l: List => l.filterBy(filter);
@@ -134,12 +134,31 @@ class Main inherits IO {
                     esac;
                 };
             } else if cmd = "sortBy" then {
-                out_string("print\n");
+                let idx: Int <- new PrintableInt.atoi(stringTokenizer.nextToken()) - 1,
+                    ls: PrintableObject <- lists.get(idx),
+                    comparatorType: String <- stringTokenizer.nextToken(),
+                    direction: String <- stringTokenizer.nextToken(),
+                    comparator: Comparator
+                in {
+                    comparator <- if comparatorType = "PriceComparator" then new PriceComparator else
+                        if comparatorType = "RankComparator" then new RankComparator else
+                        if comparatorType = "AlphabeticComparator" then new AlphabeticComparator else {
+                            abort();
+                            new PriceComparator;
+                        } fi fi fi;
+                    
+                    if direction = "descendent" then comparator.desc() else comparator fi;
+
+                    case ls of
+                        l: List => l.sortBy(comparator);
+                        o: Object => abort();
+                    esac;
+                };
             } else if cmd = "exit" then {
                 abort();
             } else {
                 out_string("unknown command\n");
-                -- abort();
+                abort();
             } fi fi fi fi fi fi fi;
 
             stringTokenizer.init(in_string(), " ");

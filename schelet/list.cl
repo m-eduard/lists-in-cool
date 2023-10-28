@@ -146,20 +146,22 @@ class List inherits PrintableObject {
     tl: List;
     size: Int <- 0;
 
+    wrap(o: Object) : PrintableObject {
+        case o of
+            printable: PrintableObject => printable;
+            s: String => new PrintableString.init(s);
+            i: Int => new PrintableInt.init(i);
+            b: Bool => new PrintableBool.init(b);
+            io: IO => new PrintableIO.init(io);
+            list: List => list;
+            obj: Object => {abort(); new PrintableInt.init(0);};
+        esac
+    };
+
     add(o : Object) : List {{
         if size = 0 then {
             -- Wrap the new element in a PrintableObject
-            let wrappedO: PrintableObject <-
-                case o of
-                    printable: PrintableObject => printable;
-                    s: String => new PrintableString.init(s);
-                    i: Int => new PrintableInt.init(i);
-                    b: Bool => new PrintableBool.init(b);
-                    io: IO => new PrintableIO.init(io);
-                    list: List => list;
-                    obj: Object => {abort(); new PrintableInt.init(0);};
-                esac
-            in {
+            let wrappedO: PrintableObject <- wrap(o) in {
                 hd <- wrappedO;
             };
         } else {
@@ -249,6 +251,38 @@ class List inherits PrintableObject {
         self;
     }};
 
+    insert(idx: Int, o: Object) : List {{
+        if size <= idx then {
+            -- Add the new element at the end of the list
+            self.add(o);
+        } else {
+            if idx = 0 then {
+                if size = 0 then {
+                    hd <- wrap(o);
+                } else {
+                    if isvoid tl then {
+                        tl <- new List.add(hd);
+                    } else {
+                        tl.insert(0, hd);
+                    } fi;
+
+                    hd <- wrap(o);
+                } fi;
+            } else if not isvoid tl then {
+                    tl.insert(idx - 1, o);
+            } else {
+                -- it is impossible to have a void tail
+                -- and the current index to be different than 0
+                new IO.out_string("This should never happen");
+                abort();
+            } fi fi;
+
+            size <- size + 1;
+        } fi;
+
+        self;
+    }};
+
     merge(other: List) : SELF_TYPE {{
         if size = 0 then {
             hd <- other.getHd();
@@ -301,34 +335,59 @@ class List inherits PrintableObject {
         self;
     }};
 
-    sortBy():SELF_TYPE {
-        self (* TODO *)
-    };
-};
+    getMin(comparator: Comparator) : Int {
+        if size = 0 then ~1 else {
+            let minIdx: Int <- 0,
+                minVal: PrintableObject <- get(0),
+                current: List <- self,
+                i: Int <- 0,
+                revI: Int <- size - 1
+            in {
+                while 0 <= revI loop {
+                    let compareResult: Int <- comparator.compareTo(current.getHd(), minVal) in {
+                        if compareResult < 0 then {
+                            minIdx <- i;
+                            minVal <- current.getHd();
+                        } else {
+                            minVal;
+                        } fi;
+                    };
 
-class ProductFilter inherits Filter {
-    filter(o: Object) : Bool {
-        case o of
-            p: Product => true;
-            o: Object => false;
-        esac
-    };
-};
+                    i <- i + 1;
+                    revI <- revI - 1;
+                    current <- current.getTl();
+                } pool;
 
-class RankFilter inherits Filter {
-    filter(o: Object) : Bool {
-        case o of
-            r: Rank => true;
-            o: Object => false;
-        esac
+                minIdx;
+            };
+        } fi
     };
-};
 
-class SamePriceFilter inherits Filter {
-    filter(o: Object) : Bool {
-        case o of
-            p: Product => p.getprice() = p@Product.getprice();
-            o: Object => false;
-        esac
-    };
+    sortBy(comparator: Comparator) : SELF_TYPE {{
+        if size = 0 then {
+            self;
+        } else let current: List <- self, i: Int <- size - 1 in {
+                while 0 <= i loop {
+                    -- Replace the current head with the minimum element found
+                    -- (swap the min element found and the current list's head)
+                    let minIdx: Int <- current.getMin(comparator),
+                        tmpHd: PrintableObject <- current.getHd()
+                    in {
+                        if minIdx = 0 then {current;} else {
+                            current.remove(0);
+                            current.insert(0, current.get(minIdx - 1));
+                            
+                            current.insert(minIdx, tmpHd);
+                            current.remove(minIdx + 1);
+                        } fi;
+                    };
+
+                    current <- current.getTl();
+                    i <- i - 1;
+                } pool;
+            }
+        fi;
+
+        self;
+    }};
 };
